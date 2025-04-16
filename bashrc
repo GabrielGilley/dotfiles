@@ -1,16 +1,21 @@
 # .bashrc
 # Fancy two-line prompt (Kali-style, no hostname, with colors)
 
-export PS1="\n\[\e[1;32m\]┌──(\[\e[32m\]\u\[\e[0m\])-[\[\e[34m\]\w\[\e[0m\]]\n\[\e[1;32m\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 
-/opt/homebrew/bin/brew shellenv >> ~/.bashrc
-eval "$(/opt/homebrew/bin/brew shellenv)"
- 
 # Source global definitions
 if [ -f /etc/bashrc ]; then
-        . /etc/bashrc
+    . /etc/bashrc
 fi
+
+
+export PS1="\n\[\e[1;32m\]┌──(\[\e[32m\]\u\[\e[0m\])-[\[\e[34m\]\w\[\e[0m\]]\n\[\e[1;32m\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
+
+eval "$(/opt/homebrew/bin/brew shellenv)"
  
+ 
+# Suppress the Apple zsh message
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
 set bell-style none
 # stty -ixon
 # Uncomment the following line if you don't like systemctl's auto-paging feature:
@@ -75,10 +80,3 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
-
-export HOMEBREW_PREFIX="/opt/homebrew";
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
-export HOMEBREW_REPOSITORY="/opt/homebrew";
-PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin"; export PATH;
-[ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";

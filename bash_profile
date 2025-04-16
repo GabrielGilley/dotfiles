@@ -1,7 +1,10 @@
-# Load .bashrc if it exists
+
+
+# Load personal interactive config
 if [ -f ~/.bashrc ]; then
     . ~/.bashrc
 fi
+
 export PS1="\n\[\e[1;32m\]┌──(\[\e[32m\]\u\[\e[0m\])-[\[\e[34m\]\w\[\e[0m\]]    \n\[\e[1;32m\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo     '\$'; fi) "
 
 if [ -x /usr/bin/dircolors ]; then
@@ -12,4 +15,4 @@ if [ -x /usr/bin/dircolors ]; then
     alias egrep='egrep --color=auto'
 fi
 
-eval "$(/opt/homebrew/bin/brew shell env)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
