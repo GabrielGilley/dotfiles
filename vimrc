@@ -101,7 +101,14 @@ augroup end
 syntax on
 autocmd BufRead,BufNewFile MANIFEST set filetype=yaml
 autocmd BufRead,BufNewFile firewheel-ssh-config set filetype=sshconfig
- 
+if has("autocmd")
+  autocmd BufReadPost *
+        \ if line("'\"") > 0 && line("'\"") <= line("$") |
+        \   execute "normal! g`\"" |
+        \ endif
+endif
+
+
 syntax on
 syntax include @sh syntax/sh.vim
 syntax region shSnip matchgroup=Snip start="@begin=sh@" end="@end=sh@" contains=@sh
@@ -128,5 +135,6 @@ au! Syntax scala source ~/.vim/syntax/scala.vim
 set tabpagemax=50
 set cursorline
 highlight Cursorline term=bold cterm=bold guibg=Grey40
- 
- 
+
+source ~/.vim/commenting
+source ~/.vim/clipboard
