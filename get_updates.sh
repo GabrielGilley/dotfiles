@@ -15,3 +15,5 @@ cp ~/.tmux.conf tmux.conf
 mv bash_profile legacy_bash_profile
 cp ~/.bash_profile bash_profile
 
+mv dircolors legacy_dircolors
+cp ~/.dircolors dircolors
