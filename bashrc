@@ -30,33 +30,7 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# Original
-# export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
-# -------------------------------------- Colors -------------------------------------- #
-if [[ $EUID == 0 ]]; then
-  USER_COLOR="\[\e[1;91m\]"  # Light Red for root
-else
-  USER_COLOR="\[\e[1;32m\]"  # Light Green for normal users
-fi
-
-RESET_COLOR="\[\e[0m\]"
-PATH_COLOR="\[\e[1;96m\]"
-TIME_COLOR="\[\e[1;33m\]"
-
-# -------------------------------------- PS1 Prompt -------------------------------------- #
-# export PS1="\n${USER_COLOR}┌──(\u)${RESET_COLOR}-[${PATH_COLOR}\w${RESET_COLOR}] (${TIME_COLOR}\t${RESET_COLOR})\n${USER_COLOR}└─${RESET_COLOR} $(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
-# -------------------------------------- Static Colors -------------------------------------- #
-RESET_COLOR="\[\e[0m\]"
-PATH_COLOR="\[\e[1;96m\]"
-TIME_COLOR="\[\e[1;33m\]"
-
-# -------------------------------------- PS1 Prompt -------------------------------------- #
-# With variables
-# export PS1="\n\[$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)\[$RESET_COLOR\]-[${PATH_COLOR}\w${RESET_COLOR}] (${TIME_COLOR}\t${RESET_COLOR})\n\[$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─${RESET_COLOR} \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
-
-# With Hostname
-# export PS1="\n\[$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u\[$(if [[ -n \$SSH_CONNECTION ]]; then echo '\e[1;33m@\h'; fi)\]\[$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\])\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 
 export EZA_COLORS="ur=1;33:uw=1;31:ux=1;32:gr=1;33:gw=1;31:gx=1;32:tr=1;33:tw=1;31:tx=1;32:uu=1;32:gu=1;32:da=1;33:di=1;36:ga=1;33:gm=1;33:gd=1;31:gn=1;32:sb=1;33:ln=1;31:or=31"
 export BASH_SILENCE_DEPRECATION_WARNING=1
