@@ -138,3 +138,4 @@ highlight Cursorline term=bold cterm=bold guibg=Grey40
 
 source ~/.vim/commenting
 source ~/.vim/clipboard
+source ~/.vim/surround_word

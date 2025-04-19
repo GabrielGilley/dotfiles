@@ -1,0 +1,36 @@
+
+" Smart Insert Around Word or Visual Selection
+function! SmartWordInsert()
+  let l:char = input('Insert character: ')
+  if l:char == '('
+    let l:left = '('
+    let l:right = ')'
+  elseif l:char == '['
+    let l:left = '['
+    let l:right = ']'
+  elseif l:char == '{'
+    let l:left = '{'
+    let l:right = '}'
+  elseif l:char == '<'
+    let l:left = '<'
+    let l:right = '>'
+  else
+    let l:left = l:char
+    let l:right = l:char
+  endif
+
+  if mode() ==# 'v' || mode() ==# 'V' || mode() ==# "\<C-v>"
+    " Visual mode: wrap the selected text
+    normal! `<v`>l
+    execute "normal! c" . l:left . "\<C-r>\"" . l:right
+    normal! gv
+  else
+    " Normal mode: wrap the word under cursor
+    normal! viw
+    execute "normal! c" . l:left . expand('<cword>') . l:right
+  endif
+endfunction
+
+" Map \wI to SmartWordInsert
+nnoremap <leader>wI :call SmartWordInsert()<CR>
+xnoremap <leader>wI :<C-u>call SmartWordInsert()<CR>
