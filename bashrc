@@ -73,6 +73,7 @@ alias mypy='mypy --strict --disallow-any-explicit'
 
 # Hijacks most installs and sends them to a tmux session
 source ~/.bashrc.d/installs_to_background
+source ~/.bashrc.d/tmux_run
 
 # -------------------------------------- Functions -------------------------------------- # 
 follow() { mv "$1" "$2" && if [ -d "$2" ]; then cd "$2"; else cd "$(dirname "$2")"; fi }

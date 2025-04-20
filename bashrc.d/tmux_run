@@ -1,0 +1,39 @@
+# ~/.bashrc.d/tmux-run
+
+tmux-run() {
+    # Combine all arguments into a command string
+    local cmd="$*"
+
+    if [ -z "$cmd" ]; then
+        echo "[ERROR] No command provided."
+        echo "Usage: tmux_run <command>"
+        return 1
+    fi
+
+    # Check if tmux is installed
+    if ! command -v tmux >/dev/null 2>&1; then
+        echo "[ERROR] tmux is not installed."
+        return 1
+    fi
+
+    # Check if already inside a tmux session
+    if [ -n "$TMUX" ]; then
+        echo "[INFO] Already inside a tmux session. Running normally."
+        eval "$cmd"
+        return $?
+    fi
+
+    # Generate a junk random session name
+    local session="tmuxrun-$(date +%s%N)"
+
+    # Start the tmux session detached, run the command, and auto-kill after
+    tmux new-session -d -s "$session" "
+        ($cmd);
+        tmux kill-session -t \"$session\"
+    "
+
+    echo "[INFO] Command started in background tmux session [$session]"
+    echo "[INFO] You can attach with: tmux attach-session -t $session"
+}
+
+
