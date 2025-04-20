@@ -53,6 +53,6 @@ define_wrapper() {
     "
 }
 
-for cmd in brew apt apt-get dnf yum wget curl pip pip3 git; do
+for cmd in brew apt apt-get dnf yum wget curl pip pip3 git cabal; do
     define_wrapper "$cmd"
 done
