@@ -13,6 +13,13 @@ Red username for root, shows host only if ssh'd
 ## Install Hijack
 If tmux is installed and you're not already in one, installs, wgets, and curls will spawn a tmux session for the install and terminate it after so you can keep your active terminal available to you and the download won't be lost if you lose the session.
 
+## tmux-run
+Usage tmux-run $@
+
+Runs selected command in a tmux shell in the background and auto kills it
+
+Why? terminal sharing, persistence through ssh disconnect, reattaching
+
 ## Vim custom commands
 ### Commenting
 GC and GU comment and uncomment lines from normal and visual modes. Auto-detects file type for comments.
