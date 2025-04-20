@@ -94,5 +94,5 @@ back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous dire
 oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*//'); if [[ -n "$last_command" ]]; then first_arg=$(echo "$last_command" | awk '{print $1}'); modified_command="${last_command/$first_arg/$1}"; eval "$modified_command"; else echo "No previous command found."; fi; }
 
 # View a markdown file prettily
-viewmd() { pandoc "$1" -t html | w3m -T text/html; }
+viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
