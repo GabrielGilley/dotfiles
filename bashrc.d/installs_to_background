@@ -1,0 +1,39 @@
+# ~/.bash_functions
+
+tmux_wrap_command() {
+    local exe="$1"
+    shift
+    local session="installer-$(date +%s%N)"
+    local tmpfile="/tmp/${session}_exitcode"
+
+    # Check if tmux is installed
+    if ! command -v tmux >/dev/null 2>&1; then
+        echo "[ERROR] tmux is not installed. Running '$exe' normally."
+        command "$exe" "$@"
+        return
+    fi
+
+    # Start tmux session detached, run command and exit
+    tmux new-session -d -s "$session" "
+        ($exe $@);
+        echo \$? > $tmpfile;
+        tmux kill-session -t \"$session\"
+    "
+
+    printf "[INFO] [%s] started in background tmux session [%s].\n" "$exe" "$session"
+    printf "[INFO] You can attach with: tmux attach-session -t %s\n" "$session"
+}
+
+define_wrapper() {
+    local tool="$1"
+    eval "
+        $tool() {
+            tmux_wrap_command $tool \"\$@\"
+        }
+    "
+}
+
+for cmd in brew apt apt-get dnf yum wget curl pip pip3; do
+    define_wrapper "$cmd"
+done
+
