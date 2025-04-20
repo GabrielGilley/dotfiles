@@ -35,12 +35,24 @@ define_wrapper() {
     local tool="$1"
     eval "
         $tool() {
-            tmux_wrap_command $tool \"\$@\"
+            if [[ \"$tool\" == \"git\" ]]; then
+                # Only wrap git pull or git clone
+                case \"\$1\" in
+                    pull|clone)
+                        tmux_wrap_command $tool \"\$@\"
+                        ;;
+                    *)
+                        command $tool \"\$@\"
+                        ;;
+                esac
+            else
+                # Normal wrapping for other tools
+                tmux_wrap_command $tool \"\$@\"
+            fi
         }
     "
 }
 
-for cmd in brew apt apt-get dnf yum wget curl pip pip3; do
+for cmd in brew apt apt-get dnf yum wget curl pip pip3 git; do
     define_wrapper "$cmd"
 done
-
