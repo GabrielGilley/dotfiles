@@ -22,7 +22,7 @@ Why? terminal sharing, persistence through ssh disconnect, reattaching
 
 ## Vim custom commands
 ### Commenting
-GC and GU comment and uncomment lines from normal and visual modes. Auto-detects file type for comments.
+gc and gu comment and uncomment lines from normal and visual modes. Auto-detects file type for comments.
 Add new file types in vim/commenting
 
 ### Copy to clipboard
