@@ -13,6 +13,13 @@ tmux_wrap_command() {
         return
     fi
 
+    # Check if already inside a tmux session
+    if [ -n "$TMUX" ]; then
+        echo "[INFO] Already inside tmux. Running '$exe' normally."
+        command "$exe" "$@"
+        return
+    fi
+
     # Start tmux session detached, run command and exit
     tmux new-session -d -s "$session" "
         ($exe $@);
