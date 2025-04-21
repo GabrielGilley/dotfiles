@@ -1,21 +1,52 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e
 
-rm ~/.bashrc
-ln -s ~/projects/configs/bashrc ~/.bashrc
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ARCHIVE_OLD=true
 
-rm ~/.vimrc
-ln -s ~/projects/configs/vimrc ~/.vimrc
+if [[ "$1" == "--no-archive" ]]; then
+    ARCHIVE_OLD=false
+fi
 
-rm ~/.bash_profile
-ln -s ~/projects/configs/bash_profile ~/.bash_profile
+if [ "$ARCHIVE_OLD" = true ]; then
+    ARCHIVE_DIR="$SCRIPT_DIR/archive"
+    mkdir -p "$ARCHIVE_DIR"
+fi
 
-rm ~/.dircolors
-ln -s ~/projects/configs/dircolors ~/.dircolors
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
 
-rm ~/.tmux.conf
-ln -s ~/projects/configs/tmux.conf ~/.tmux.conf
+FILES=(
+    ".bashrc"
+    ".vimrc"
+    ".bash_profile"
+    ".dircolors"
+    ".tmux.conf"
+    ".vim"
+    ".bashrc.d"
+)
 
-rm -r ~/.vim
-ln -s ~/projects/configs/vim ~/.vim
+for TARGET in "${FILES[@]}"; do
+    BASENAME="${TARGET#.}"
+    SOURCE="$SCRIPT_DIR/$BASENAME"
+    DEST="$HOME/$TARGET"
 
-source ~/.bash_profile
+    if [ -e "$DEST" ] || [ -L "$DEST" ]; then
+        if [ "$ARCHIVE_OLD" = true ]; then
+            mv "$DEST" "$ARCHIVE_DIR/$(basename "$TARGET")_$TIMESTAMP"
+            echo "[INFO] Archived $DEST to $ARCHIVE_DIR"
+        else
+            rm -rf "$DEST"
+            echo "[INFO] Removed $DEST"
+        fi
+    fi
+
+    ln -s "$SOURCE" "$DEST"
+    echo "[INFO] Linked $SOURCE -> $DEST"
+done
+
+if [ -f "$HOME/.bash_profile" ]; then
+    source "$HOME/.bash_profile"
+fi
+
+echo "[DONE] Dotfiles setup complete."
+
