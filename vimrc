@@ -136,6 +136,6 @@ set tabpagemax=50
 set cursorline
 highlight Cursorline term=bold cterm=bold guibg=Grey40
 
-source ~/.vim/commenting
-source ~/.vim/clipboard
-source ~/.vim/surround_word
+source ~/.vim/commenting.vim
+source ~/.vim/clipboard.vim
+source ~/.vim/surround.vim
