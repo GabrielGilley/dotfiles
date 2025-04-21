@@ -50,6 +50,5 @@ Add new file types in vim/commenting
 In normal and visual modes, \y and \d work like yy and dd but also copy to clipboard. Supposed to auto-detect shell for appropriate clipboard but only tested for mac.
 
 ### Surrounding a Word
-In normal and visual mode, \wI lets you insert characters on both sides of word or highlighted portion. It is smart, inserting "(" auto inserts ")" to the right, same with [] and {}. 
-Quotes and others are doubled, so inserting ' " ' will surround the word with double quotes on both sides.
-
+Tpope's:
+https://github.com/tpope/vim-surround.git
