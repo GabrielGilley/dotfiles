@@ -90,6 +90,41 @@ define_wrapper() {
                         fi
                         ;;
                 esac
+            elif [[ "$tool" == "cargo" ]]; then
+                case "$1" in
+                    install)
+                        if (( is_sudo )); then
+                            tmux_wrap_command sudo $tool $extra_flags "$@"
+                        else
+                            tmux_wrap_command $tool $extra_flags "$@"
+                        fi
+                        ;;
+                    *)
+                        if (( is_sudo )); then
+                            sudo command $tool $extra_flags "$@"
+                        else
+                            command $tool $extra_flags "$@"
+                        fi
+                        ;;
+                esac
+ 
+            elif [[ "$tool" == "conda" ]]; then
+                case "$1" in
+                    install|update)
+                        if (( is_sudo )); then
+                            tmux_wrap_command sudo $tool $extra_flags "$@"
+                        else
+                            tmux_wrap_command $tool $extra_flags "$@"
+                        fi
+                        ;;
+                    *)
+                        if (( is_sudo )); then
+                            sudo command $tool $extra_flags "$@"
+                        else
+                            command $tool $extra_flags "$@"
+                        fi
+                        ;;
+                esac
             else
                 if (( is_sudo )); then
                     tmux_wrap_command sudo $tool \$extra_flags \"\$@\"
@@ -101,18 +136,27 @@ define_wrapper() {
     "
 }
 
+WRAPPED_TOOLS=(brew apt apt-get dnf yum wget curl pip pip3 git cargo snap)
+
 # Install command wrappers
-for cmd in brew apt apt-get dnf yum wget curl pip pip3 git; do
+for cmd in "${WRAPPED_TOOLS[@]}"; do
     define_wrapper "$cmd"
 done
 
 # Special sudo wrapper
+# Special sudo wrapper
 sudo() {
-    if [[ "$1" =~ ^(brew|apt|apt-get|dnf|yum|wget|curl|pip|pip3|git)$ ]]; then
-        local tool="$1"
-        shift
-        $tool sudo "$@"
-    else
-        command sudo "$@"
-    fi
+    local first="$1"
+    shift
+
+    for tool in "${WRAPPED_TOOLS[@]}"; do
+        if [[ "$first" == "$tool" ]]; then
+            $tool sudo "$@"
+            return
+        fi
+    done
+
+    # Not a special tool? Fallback
+    command sudo "$first" "$@"
 }
+
