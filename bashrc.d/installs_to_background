@@ -6,53 +6,113 @@ tmux_wrap_command() {
     local session="installer-$(date +%s%N)"
     local tmpfile="/tmp/${session}_exitcode"
 
-    # Check if tmux is installed
     if ! command -v tmux >/dev/null 2>&1; then
         echo "[ERROR] tmux is not installed. Running '$exe' normally."
         command "$exe" "$@"
         return
     fi
 
-    # Check if already inside a tmux session
     if [ -n "$TMUX" ]; then
         echo "[INFO] Already inside tmux. Running '$exe' normally."
         command "$exe" "$@"
         return
     fi
 
-    # Start tmux session detached, run command and exit
-    tmux new-session -d -s "$session" "
-        ($exe $@);
-        echo \$? > $tmpfile;
-        tmux kill-session -t \"$session\"
-    "
+    if [[ "$exe" == "sudo" ]]; then
+        echo "[SUDO] Launching attached tmux session for password entry only."
 
-    printf "[INFO] [%s] started in background tmux session [%s].\n" "$exe" "$session"
-    printf "[INFO] You can attach with: tmux attach-session -t %s\n" "$session"
+        # Start ATTACHED tmux session
+        tmux new-session -s "$session" bash -c "
+            echo '[INFO] Authenticating sudo...';
+            sudo true;
+            status=\$?;
+            if [[ \$status -eq 0 ]]; then
+                echo '[INFO] Sudo authentication successful. Auto-detaching...';
+                sleep 1;
+                tmux detach-client;
+                sleep 1;
+                echo '[INFO] Starting real command...';
+                sudo $(printf '%q ' "$@");
+                echo \$? > \"$tmpfile\";
+                tmux kill-session -t \"$session\";
+            else
+                echo '[ERROR] Sudo authentication failed. Staying attached.';
+                exit 1;
+            fi
+        "
+    else
+        echo "[INFO] Launching detached tmux session."
+
+        # Start DETACHED tmux session
+        tmux new-session -d -s "$session" "
+            \"$exe\" $(printf '%q ' "$@");
+            echo \$? > \"$tmpfile\";
+            tmux kill-session -t \"$session\"
+        "
+        printf "[INFO] [%s] started in background tmux session [%s].\n" "$exe" "$session"
+        printf "[INFO] You can attach manually: tmux attach-session -t %s\n" "$session"
+    fi
 }
 
 define_wrapper() {
     local tool="$1"
     eval "
         $tool() {
+            local is_sudo=0
+
+            if [[ \"\$1\" == \"sudo\" ]]; then
+                is_sudo=1
+                shift
+                if [[ \"\$1\" == \"$tool\" ]]; then
+                    shift
+                fi
+            fi
+
+            local extra_flags=\"\"
+            if [[ \"$tool\" == \"apt\" || \"$tool\" == \"apt-get\" ]]; then
+                extra_flags=\"-y\"
+            fi
+
             if [[ \"$tool\" == \"git\" ]]; then
-                # Only wrap git pull or git clone
                 case \"\$1\" in
                     pull|clone)
-                        tmux_wrap_command $tool \"\$@\"
+                        if (( is_sudo )); then
+                            tmux_wrap_command sudo $tool \$extra_flags \"\$@\"
+                        else
+                            tmux_wrap_command $tool \$extra_flags \"\$@\"
+                        fi
                         ;;
                     *)
-                        command $tool \"\$@\"
+                        if (( is_sudo )); then
+                            sudo command $tool \$extra_flags \"\$@\"
+                        else
+                            command $tool \$extra_flags \"\$@\"
+                        fi
                         ;;
                 esac
             else
-                # Normal wrapping for other tools
-                tmux_wrap_command $tool \"\$@\"
+                if (( is_sudo )); then
+                    tmux_wrap_command sudo $tool \$extra_flags \"\$@\"
+                else
+                    tmux_wrap_command $tool \$extra_flags \"\$@\"
+                fi
             fi
         }
     "
 }
 
+# Install command wrappers
 for cmd in brew apt apt-get dnf yum wget curl pip pip3 git; do
     define_wrapper "$cmd"
 done
+
+# Special sudo wrapper
+sudo() {
+    if [[ "$1" =~ ^(brew|apt|apt-get|dnf|yum|wget|curl|pip|pip3|git)$ ]]; then
+        local tool="$1"
+        shift
+        $tool sudo "$@"
+    else
+        command sudo "$@"
+    fi
+}
