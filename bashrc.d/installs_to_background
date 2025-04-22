@@ -90,23 +90,23 @@ define_wrapper() {
                         fi
                         ;;
                 esac
-            elif [[ "$tool" == "cargo" ]]; then
-                case "$1" in
-                    install)
-                        if (( is_sudo )); then
-                            tmux_wrap_command sudo $tool $extra_flags "$@"
-                        else
-                            tmux_wrap_command $tool $extra_flags "$@"
-                        fi
-                        ;;
-                    *)
-                        if (( is_sudo )); then
-                            sudo command $tool $extra_flags "$@"
-                        else
-                            command $tool $extra_flags "$@"
-                        fi
-                        ;;
-                esac
+#             elif [[ "$tool" == "cargo" ]]; then
+#                 case "$1" in
+#                     install)
+#                         if (( is_sudo )); then
+#                             tmux_wrap_command sudo $tool $extra_flags "$@"
+#                         else
+#                             tmux_wrap_command $tool $extra_flags "$@"
+#                         fi
+#                         ;;
+#                     *)
+#                         if (( is_sudo )); then
+#                             sudo command $tool $extra_flags "$@"
+#                         else
+#                             command $tool $extra_flags "$@"
+#                         fi
+#                         ;;
+#                 esac
  
             elif [[ "$tool" == "conda" ]]; then
                 case "$1" in
@@ -136,7 +136,7 @@ define_wrapper() {
     "
 }
 
-WRAPPED_TOOLS=(brew apt apt-get dnf yum wget curl pip pip3 git cargo snap)
+WRAPPED_TOOLS=(brew apt apt-get dnf yum wget curl pip pip3 git snap)
 
 # Install command wrappers
 for cmd in "${WRAPPED_TOOLS[@]}"; do

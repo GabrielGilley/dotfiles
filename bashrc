@@ -38,9 +38,9 @@ if ! shopt -oq posix; then
   fi
 fi
 export PATH=$HOME/edirect:${PATH}
+. "$HOME/.cargo/env"
 
 # -------------------------------------- Aliases -------------------------------------- #
-
 # Set grep colors and ls colors if gdircolors is available
 if command -v gdircolors >/dev/null 2>&1; then
     if [ -r ~/.dircolors ]; then
