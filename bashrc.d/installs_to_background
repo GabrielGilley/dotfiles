@@ -136,7 +136,7 @@ define_wrapper() {
     "
 }
 
-WRAPPED_TOOLS=(brew apt apt-get dnf yum wget curl pip pip3 git snap)
+WRAPPED_TOOLS=(brew apt apt-get dnf yum wget curl pip pip3 git pacman snap)
 
 # Install command wrappers
 for cmd in "${WRAPPED_TOOLS[@]}"; do
