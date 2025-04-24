@@ -17,6 +17,22 @@ set modelines=30
 map gr gT
  
 map <Home> ^
+
+" Paragraph motion
+nnoremap J }
+nnoremap K {
+vnoremap J }
+vnoremap K {
+onoremap J }
+onoremap K {
+
+" Line motion
+nnoremap H ^
+nnoremap L $
+vnoremap H ^
+vnoremap L $
+onoremap H ^
+onoremap L $
  
  
  
