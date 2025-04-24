@@ -38,6 +38,7 @@ if ! shopt -oq posix; then
   fi
 fi
 export PATH=$HOME/edirect:${PATH}
+export PATH={$PATH}:$HOME/.local/bin
 . "$HOME/.cargo/env"
 
 # -------------------------------------- Aliases -------------------------------------- #
@@ -73,6 +74,7 @@ alias pip=pip3
 alias python=python3
 alias pudb=pudb3
 alias mypy='mypy --strict --disallow-any-explicit'
+alias tmls='tmux ls'
 
 # Hijacks most installs and sends them to a tmux session
 source ~/.bashrc.d/installs_to_background
@@ -82,6 +84,8 @@ source ~/.bashrc.d/tmux_run
 follow() { mv "$1" "$2" && if [ -d "$2" ]; then cd "$2"; else cd "$(dirname "$2")"; fi }
 mcdir() { mkdir -p "$1" && cd "$1"; }
 tat() { tmux a -t $1; }
+tks() { tmux kill-session -t $1; }
+tns() { tmux new-session -s $1; }
 
 # ls upon cd
 cd() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
@@ -99,3 +103,5 @@ oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.ghcup/bin:$PATH"
