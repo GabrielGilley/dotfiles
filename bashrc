@@ -1,6 +1,17 @@
 # .bashrc
 
 # -------------------------------------- Env and Hooks -------------------------------------- # 
+
+# Homebrew
+if [[ "$(uname)" == 'Darwin' ]]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    export HOMEBREW_PREFIX="/opt/homebrew";
+    export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
+    export HOMEBREW_REPOSITORY="/opt/homebrew";
+    PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/Library/Apple/usr/bin"; export PATH;
+    [ -z "${MANPATH-}" ] || export MANPATH=":${MANPATH#:}";
+fi
+
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 __conda_setup="$('/usr/bin/conda' 'shell.bash' 'hook' 2> /dev/null)"
@@ -39,7 +50,9 @@ if ! shopt -oq posix; then
 fi
 export PATH=$HOME/edirect:${PATH}
 export PATH={$PATH}:$HOME/.local/bin
-. "$HOME/.cargo/env"
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/.ghcup/bin:$PATH"
+source "$HOME/.cargo/env"
 
 # -------------------------------------- Aliases -------------------------------------- #
 # Set grep colors and ls colors if gdircolors is available
@@ -103,5 +116,3 @@ oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/.ghcup/bin:$PATH"
