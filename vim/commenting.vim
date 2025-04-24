@@ -34,6 +34,7 @@ let s:commentchars = {
 \ 'html': '<!--',
 \ 'css': '/*',
 \ 'swift': '//',
+\ 'cabal': '--',
 \ }
 
 " Helper to get comment string based on file extension
