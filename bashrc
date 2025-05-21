@@ -48,8 +48,8 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-export PATH=$HOME/edirect:${PATH}
-export PATH={$PATH}:$HOME/.local/bin
+export PATH=$HOME/edirect:$PATH
+export PATH=$PATH:$HOME/.local/bin
 export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$HOME/.ghcup/bin:$PATH"
 source "$HOME/.cargo/env"
