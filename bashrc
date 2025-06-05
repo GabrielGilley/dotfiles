@@ -69,6 +69,8 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
+# Set diff color
+alias diff='diff -y --color'
 
 # Use EZA if available
 if command -v eza >/dev/null 2>&1; then
@@ -90,7 +92,7 @@ alias mypy='mypy --strict --disallow-any-explicit'
 alias tmls='tmux ls'
 
 # Hijacks most installs and sends them to a tmux session
-source ~/.bashrc.d/installs_to_background
+# source ~/.bashrc.d/installs_to_background
 source ~/.bashrc.d/tmux_run
 
 # -------------------------------------- Functions -------------------------------------- # 
@@ -115,4 +117,7 @@ oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*
 
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
+
+# Add, commit, and push
+gita() { [ "$#" -ne 2 ] && { echo "Usage: gita file/to/add \"commit message\""; return 1; } || git add "$1" && git commit -m "$2" && git push; }
 
