@@ -1,7 +1,7 @@
 # Dotfiles Files for Unix
 Includes tmux, vim, bash, and dircolors
 
-## ./install.sh
+## ./link\_dotfiles.sh
 Creates a symlink to the files in these directories.
 
 Removes existing dotfiles!
