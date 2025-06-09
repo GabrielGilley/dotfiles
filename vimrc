@@ -34,7 +34,8 @@ vnoremap L $
 onoremap H ^
 onoremap L $
  
- 
+" Make Y behave like C and D
+nnoremap Y $y
  
 "=====[ Highlight matches when jumping to next ]=============
     " This rewires n and N to do the highlighing...
