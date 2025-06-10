@@ -158,6 +158,10 @@ oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
+# Move or copy and assume same directory
+mvn() { [ "$#" -ne 2 ] && { echo "Usage: mvn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || mv "$1" "$(dirname "$1")/$2"; }
+cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || cp "$1" "$(dirname "$1")/$2"; }
+
 # Add, commit, and push
-gita() { [ "$#" -ne 2 ] && { echo "Usage: gita file/to/add \"commit message\""; return 1; } || git add "$1" && git commit -m "$2" && git push; }
+gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
 
