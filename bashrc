@@ -33,6 +33,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+export EDITOR=vim
+
 # -------------------------------------- Environment -------------------------------------- # 
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
