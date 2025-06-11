@@ -27,6 +27,8 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
+[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
+
 # -------------------------------------- Environment -------------------------------------- # 
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
@@ -120,4 +122,5 @@ viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
 # Add, commit, and push
 gita() { [ "$#" -ne 2 ] && { echo "Usage: gita file/to/add \"commit message\""; return 1; } || git add "$1" && git commit -m "$2" && git push; }
+
 
