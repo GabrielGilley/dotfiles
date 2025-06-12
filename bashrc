@@ -170,4 +170,24 @@ cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_sta
 
 # Add, commit, and push
 gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
+unpull() {
+    # Check for uncommitted changes
+    if [[ -n $(git status --porcelain) ]]; then
+        echo "There are uncommitted changes. Please commit or stash them before running git-unpull."
+        return 1
+    fi
+
+    # Check for unpushed commits
+    if [[ -n $(git log --branches --not --remotes) ]]; then
+        echo "There are unpushed commits. Please push or reset them before running git-unpull."
+        return 1
+    fi
+
+    # Get the commit hash before the last pull
+    last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}')
+
+    # Perform the reset
+    git reset --hard "$last_commit_hash"
+    echo "Successfully reset to the commit before the last pull: $last_commit_hash"
+}
 
