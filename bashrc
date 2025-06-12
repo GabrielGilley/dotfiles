@@ -1,8 +1,10 @@
 # .bashrc
 
-# -------------------------------------- Set Work Proxies -------------------------------------- # 
+# -------------------------------------- set work proxies -------------------------------------- # 
 
-if [ -f ~/.bashrc.d/proxies ]; then
+SET_PROXIES=false  # Change this as appropriate
+
+if [ -f ~/.bashrc.d/proxies ] && [ "$SET_PROXIES" = true ]; then
     source ~/.bashrc.d/proxies
 fi
 
@@ -33,11 +35,10 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-[ -f "$HOME/.ghcup/env" ] && . "$HOME/.ghcup/env" # ghcup-env
-
 export EDITOR=vim
 
 # -------------------------------------- Environment -------------------------------------- # 
+
 if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
@@ -47,10 +48,6 @@ fi
 error_flag=0
 
 set_prompt() {
-
-    # If the flag is set, replace $ and # with a red X.
-    # If user is root, change name to red and use #
-    # If ssh'd, add hostname
     if [ $? -eq 0 ]; then
          PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 
@@ -60,19 +57,28 @@ set_prompt() {
     fi
 }
 
-# Set PROMPT_COMMAND to call set_prompt before displaying the prompt
 PROMPT_COMMAND='set_prompt; history -a'
 
 # --------------- #
-# export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 
 export EZA_COLORS="ur=1;33:uw=1;31:ux=1;32:gr=1;33:gw=1;31:gx=1;32:tr=1;33:tw=1;31:tx=1;32:uu=1;32:gu=1;32:da=1;33:di=1;36:ga=1;33:gm=1;33:gd=1;31:gn=1;32:sb=1;33:ln=1;31:or=31"
 export BASH_SILENCE_DEPRECATION_WARNING=1
 set bell-style none
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# Get vim on the command line
+set -o vi
+
+bind -m vi-command '"H": "b"'
+bind -m vi-command '"L": "El"'
+bind -m vi-command '"J": "}"'
+bind -m vi-command '"K": "{"'
+
+bind -m vi-command '"<C-h>": "^"'
+bind -m vi-command '"<C-l>": "$"'
+bind -m vi-command '"<C-H>": "0"'
+bind -m vi-command '"<C-L>": "^"'
+
+# Programmable completion
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -88,6 +94,7 @@ export PATH="$HOME/.ghcup/bin:$PATH"
 # source "$HOME/.cargo/env"
 
 # -------------------------------------- Aliases -------------------------------------- #
+
 # Set grep colors and ls colors if gdircolors is available
 if command -v gdircolors >/dev/null 2>&1; then
     if [ -r ~/.dircolors ]; then
@@ -122,6 +129,7 @@ alias python=python3
 alias pudb=pudb3
 alias mypy='mypy --strict --disallow-any-explicit'
 alias tmls='tmux ls'
+alias tr='tmux-run'
 alias py='source ~/.default_python/bin/activate'
 alias batcat='bat'
 
@@ -131,12 +139,8 @@ alias batcat='bat'
 # Throw a command into a tmux session
 source ~/.bashrc.d/tmux_run
 
-# Hijacks pip and runs it with proxy settings
-if [ -f ~/.bashrc.d/pip_proxy ]; then
-    source ~/.bashrc.d/pip_proxy
-fi
-
 # -------------------------------------- Functions -------------------------------------- # 
+
 follow() { mv "$1" "$2" && if [ -d "$2" ]; then cd "$2"; else cd "$(dirname "$2")"; fi }
 mcdir() { mkdir -p "$1" && cd "$1"; }
 tat() { tmux a -t $1; }
@@ -166,5 +170,4 @@ cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_sta
 
 # Add, commit, and push
 gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
-
 

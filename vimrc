@@ -59,8 +59,6 @@ vnoremap L El
 onoremap H B
 onoremap L El
 
-nnoremap go o<Esc>
-nnoremap gO O<Esc>
 
 " Make Y behave as C and D
 nnoremap Y $y
