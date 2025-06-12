@@ -2,7 +2,9 @@
 
 # -------------------------------------- set work proxies -------------------------------------- # 
 
-SET_PROXIES=false  # Change this as appropriate
+if [ -f ~/.set_proxy ]; then
+    source ~/.set_proxy
+fi
 
 if [ -f ~/.bashrc.d/proxies ] && [ "$SET_PROXIES" = true ]; then
     source ~/.bashrc.d/proxies
