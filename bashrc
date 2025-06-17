@@ -134,7 +134,12 @@ alias mypy='mypy --strict --disallow-any-explicit'
 alias tmls='tmux ls'
 alias tr='tmux-run'
 alias py='source ~/.default_python/bin/activate'
-alias batcat='bat'
+alias bat='batcat'
+alias rub='git push origin --delete'
+alias lub='git branch -d'
+alias LUB='git branch -D'
+rlub() { lub $1 && rub $1; }
+RLUB() { LUB $1 && rub $1; }
 
 # Hijacks most installs and sends them to a tmux session
 # source ~/.bashrc.d/installs_to_background
