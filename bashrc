@@ -140,6 +140,7 @@ alias lub='git branch -d'
 alias LUB='git branch -D'
 rlub() { lub $1 && rub $1; }
 RLUB() { LUB $1 && rub $1; }
+alias submod='git submodule update --init --recursive'
 
 # Hijacks most installs and sends them to a tmux session
 # source ~/.bashrc.d/installs_to_background
