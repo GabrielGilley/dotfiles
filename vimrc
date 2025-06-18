@@ -14,8 +14,17 @@ set autoindent
 set modeline
 set modelines=30
  
+"Very similar to colorscheme ron"
+:set bg=dark
+:set ai
+:set et
+:set ts=4
+:set sw=4
+
+" Switch tabs
 map gr gT
- 
+
+" Go to start of text
 map <Home> ^
 
 " Paragraph motion
@@ -27,14 +36,36 @@ onoremap J }
 onoremap K {
 
 " Line motion
-nnoremap H ^
-nnoremap L $
-vnoremap H ^
-vnoremap L $
-onoremap H ^
-onoremap L $
- 
- 
+nnoremap <C-h> ^
+nnoremap <C-l> $
+vnoremap <C-h> ^
+vnoremap <C-l> $
+onoremap <C-h> ^
+onoremap <C-l> $
+
+" Line motion
+nnoremap <C-H> 0
+nnoremap <C-L> $
+vnoremap <C-H> 0
+vnoremap <C-L> $
+onoremap <C-H> 0
+onoremap <C-L> $
+
+" Word motion
+nnoremap H B
+nnoremap L El
+vnoremap H B
+vnoremap L El
+onoremap H B
+onoremap L El
+
+
+" Make Y behave as C and D
+nnoremap Y $y
+
+" Create a new line above or below but don't enter insert mode
+nnoremap go o<Esc>
+nnoremap GO O<Esc>
  
 "=====[ Highlight matches when jumping to next ]=============
     " This rewires n and N to do the highlighing...
@@ -105,14 +136,6 @@ autocmd BufRead,BufNewFile MANIFEST set filetype=json
 augroup end
  
  
-"Very similar to colorscheme ron"
-:set bg=dark
-:set ai
-:set et
-:set ts=4
-:set sw=4
- 
-:set nu
  
 syntax on
 autocmd BufRead,BufNewFile MANIFEST set filetype=yaml
@@ -142,7 +165,7 @@ highlight LineNr ctermfg=darkgrey
 " Avoid command-line redraw on every entered character by turning off Arabic
 " shaping (which is implemented poorly).
 if has('arabic')
-set noarabicshape
+    set noarabicshape
 endif
  
 au BufRead,BufNewFile *.scala set filetype=scala
@@ -155,3 +178,5 @@ highlight Cursorline term=bold cterm=bold guibg=Grey40
 source ~/.vim/commenting.vim
 source ~/.vim/clipboard.vim
 source ~/.vim/surround.vim
+" source ~/.vim/tbone.vim
+" source ~/.vim/autoload-tbone.vim
