@@ -45,6 +45,17 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
+# <<<<<<< HEAD
+# user_color() {
+#   if [[ $EUID == 0 ]]; then
+#     echo -ne '\[\e[1;91m\]'
+#   else
+#     echo -ne '\[\e[1;32m\]'
+#   fi
+# }
+
+# export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
+# =======
 # ---- Prompt ---- #
 
 error_flag=0
@@ -62,11 +73,22 @@ set_prompt() {
 PROMPT_COMMAND='set_prompt; history -a'
 
 # --------------- #
+# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 
 export EZA_COLORS="ur=1;33:uw=1;31:ux=1;32:gr=1;33:gw=1;31:gx=1;32:tr=1;33:tw=1;31:tx=1;32:uu=1;32:gu=1;32:da=1;33:di=1;36:ga=1;33:gm=1;33:gd=1;31:gn=1;32:sb=1;33:ln=1;31:or=31"
 export BASH_SILENCE_DEPRECATION_WARNING=1
+
+# Shut this up
 set bell-style none
 
+# <<<<<<< HEAD
+# # Enable vim keybinds in the command line
+# set -o vi
+
+# # enable programmable completion features (you don't need to enable
+# # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# # sources /etc/bash.bashrc).
+# # =======
 # Get vim on the command line
 set -o vi
 
@@ -81,6 +103,7 @@ bind -m vi-command '"<C-H>": "0"'
 bind -m vi-command '"<C-L>": "^"'
 
 # Programmable completion
+# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -175,7 +198,7 @@ la() { if [ "$#" -gt 1 ]; then echo "Usage: la [directory]"; return 1; fi; if [ 
 # la()  { [ "$#" -gt 1 ] && { echo "Usage: la [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lae "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
 
 # Easily chain cd .. by passing in int argument
-up() { [ "$1" -ge 1 ] 2>/dev/null && cd $(eval printf '../'%.0s {1..$1}) || echo "Usage: up <positive integer>"; }
+up(){ n=${1:-1}; [ "$n" -ge 1 ] 2>/dev/null && cd "$(eval printf '../'%.0s {1..$n})" || echo "Usage: up <positive integer>"; }
 
 # Return to previous directory
 back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous directory recorded."; fi; }
@@ -186,6 +209,54 @@ oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
+# <<<<<<< HEAD
+# Renames a pdf to LastName-Year-title-separated-by-hyphens.pdf
+# rename_pdf  oldfile.pdf
+# → Lastname-year-title-with-hyphens.pdf
+rename_pdf() {
+    local in="$1"
+    [[ -f "$in" ]] || { echo "rename_pdf: file not found"; return 1; }
+
+    # ---------- pull metadata ---------------------------------------------
+    local info author title year lastname slug
+    info=$(pdfinfo -- "$in")                                   || return $?
+
+    author=$(echo "$info" | awk -F': ' '/^Author/   {print $2; exit}')
+    title=$( echo "$info" | awk -F': ' '/^Title/    {print $2; exit}')
+    year=$(  echo "$info" | awk       '/^CreationDate/ {print $(NF-1); exit}')
+    [ -n "$year" ] || year=$(echo "$info" | awk '/^ModDate/ {print $(NF-1); exit}')
+
+    # ---------- transform pieces ------------------------------------------
+    # first author → last word before first comma
+    lastname=$(echo "$author" | cut -d',' -f1 | awk '{print $NF}')
+
+    # capitalise first letter, rest lowercase – portable
+    lastname=$(printf '%s\n' "$lastname" | \
+               awk '{printf toupper(substr($0,1,1)) tolower(substr($0,2))}')
+
+    # title → lower-case slug, non-alnum → "-"
+    slug=$(echo "$title" \
+             | tr '[:upper:]' '[:lower:]' \
+             | sed -E 's/[^a-z0-9]+/-/g; s/^-+|-+$//g')
+
+    local out="${lastname}-${year}-${slug}.pdf"
+
+    # ---------- rename safely --------------------------------------------
+    if [ -e "$out" ]; then
+        echo "rename_pdf: target '${out}' already exists" >&2
+        return 2
+    fi
+    mv -i -- "$in" "$out" && echo "renamed → $out"
+}
+
+save_file() { 
+    # usage check
+    [ -f "$1" ] || { echo "Usage: save_file <existing-file>"; return 1; }
+
+    # expand to an absolute POSIX path, then hand it to AppleScript
+    osascript -e 'set the clipboard to (POSIX file "'"$(realpath "$1")"'")'
+}
+# =======
 # Move or copy and assume same directory
 mvn() { [ "$#" -ne 2 ] && { echo "Usage: mvn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || mv "$1" "$(dirname "$1")/$2"; }
 cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || cp "$1" "$(dirname "$1")/$2"; }
@@ -209,4 +280,5 @@ gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit messag
 
 # Revert from last pull
 unpull() { if [[ -n $(git status --porcelain) ]]; then echo "There are uncommitted changes. Please commit or stash them before running unpull."; return 1; fi; if [[ -n $(git log --branches --not --remotes) ]]; then echo "There are unpushed commits. Please push or reset them before running unpull."; return 1; fi; last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}'); git reset --hard "$last_commit_hash"; echo "Successfully reset to the commit before the last pull: $last_commit_hash"; }
+# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 
