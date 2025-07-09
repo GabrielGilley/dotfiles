@@ -39,6 +39,8 @@ unset __conda_setup
 
 export EDITOR=vim
 
+source ~/.bashrc.d/ai_key
+
 # -------------------------------------- Environment -------------------------------------- # 
 
 if [ -f /etc/bashrc ]; then
@@ -115,16 +117,17 @@ alias egrep='egrep --color=auto'
 alias diff='diff -y --color'
 
 # Use EZA if available
+# We throw 'e' on the end as these are internal, 'ls' is overwritten with a function.
 if command -v eza >/dev/null 2>&1; then
-    alias ld='eza -d --group-directories-first .*'
-    alias ll='eza -Algh --git --group-directories-first --time-style=long-iso'
-    alias ls='eza --group-directories-first'
-    alias la='eza -A --group-directories-first'
+    alias lde='eza -d --group-directories-first .*'
+    alias lle='eza -Algh --git --group-directories-first --time-style=long-iso'
+    alias lse='eza --group-directories-first'
+    alias lae='eza -A --group-directories-first'
 else
-    alias ld='ls -dA --color=auto .*' # list hidden entries
-    alias ll='ls -Alh --color=auto'   # long list, human-readable
-    alias ls='ls --color=auto'        # simple listing
-    alias la='ls -A --color=auto'     # show almost all
+    alias lde='command ls -dA --color=auto .*' # list hidden entries
+    alias lle='command ls -Alh --color=auto'   # long list, human-readable
+    alias lse='command ls --color=auto'        # simple listing
+    alias lae='command ls -A --color=auto'     # show almost all
 fi
 
 alias python=python3
@@ -133,7 +136,13 @@ alias mypy='mypy --strict --disallow-any-explicit'
 alias tmls='tmux ls'
 alias tr='tmux-run'
 alias py='source ~/.default_python/bin/activate'
-alias batcat='bat'
+alias bat='batcat'
+alias rub='git push origin --delete'
+alias lub='git branch -d'
+alias LUB='git branch -D'
+rlub() { lub $1 && rub $1; }
+RLUB() { LUB $1 && rub $1; }
+alias submod='git submodule update --init --recursive'
 
 # Hijacks most installs and sends them to a tmux session
 # source ~/.bashrc.d/installs_to_background
@@ -151,8 +160,21 @@ tns() { tmux new-session -s $1; }
 tans() { tmux new-session -s $1 && tmux a -t $1; } 
 
 # ls upon cd
-cd() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
+cd()  { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
 cda() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && la; }
+
+
+# Override ls for lsn convenience
+# ls() {echo "Test"; }
+ls() { if [ "$#" -gt 1 ]; then echo "Usage: ls [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+ld() { if [ "$#" -gt 1 ]; then echo "Usage: ld [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+ll() { if [ "$#" -gt 1 ]; then echo "Usage: ll [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+la() { if [ "$#" -gt 1 ]; then echo "Usage: la [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lae "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+
+# ls()  { [ "$#" -gt 1 ] && { echo "Usage: ls [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
+# ld()  { [ "$#" -gt 1 ] && { echo "Usage: ld [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
+# ll()  { [ "$#" -gt 1 ] && { echo "Usage: ll [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
+# la()  { [ "$#" -gt 1 ] && { echo "Usage: la [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lae "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
 
 # Easily chain cd .. by passing in int argument
 up() { [ "$1" -ge 1 ] 2>/dev/null && cd $(eval printf '../'%.0s {1..$1}) || echo "Usage: up <positive integer>"; }
@@ -170,9 +192,24 @@ viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 mvn() { [ "$#" -ne 2 ] && { echo "Usage: mvn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || mv "$1" "$(dirname "$1")/$2"; }
 cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || cp "$1" "$(dirname "$1")/$2"; }
 
+
+# lsn will ls but assume the parent directory of your last ls.
+# Useful for 
+# ----------------------------------------------
+# |$ ls ../../../really/long/path/to/directory |
+# |--> dir1 dir2 dir3 dir4 file.md             |
+# |$ lsn dir1                                  |
+# ----------------------------------------------
+
+lsn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ls "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+lan() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && la "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+ldn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ld "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+lln() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ll "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+
 # Add, commit, and push
 gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
 
 # Revert from last pull
 unpull() { if [[ -n $(git status --porcelain) ]]; then echo "There are uncommitted changes. Please commit or stash them before running unpull."; return 1; fi; if [[ -n $(git log --branches --not --remotes) ]]; then echo "There are unpushed commits. Please push or reset them before running unpull."; return 1; fi; last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}'); git reset --hard "$last_commit_hash"; echo "Successfully reset to the commit before the last pull: $last_commit_hash"; }
+
 

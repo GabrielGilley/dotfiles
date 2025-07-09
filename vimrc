@@ -62,7 +62,10 @@ onoremap L El
 
 " Make Y behave as C and D
 nnoremap Y $y
- 
+
+" Create a new line above or below but don't enter insert mode
+nnoremap go o<Esc>
+nnoremap GO O<Esc>
  
 "=====[ Highlight matches when jumping to next ]=============
     " This rewires n and N to do the highlighing...
