@@ -39,6 +39,8 @@ unset __conda_setup
 
 export EDITOR=vim
 
+source ~/.bashrc.d/ai_key
+
 # -------------------------------------- Environment -------------------------------------- # 
 
 if [ -f /etc/bashrc ]; then
@@ -281,4 +283,5 @@ gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit messag
 # Revert from last pull
 unpull() { if [[ -n $(git status --porcelain) ]]; then echo "There are uncommitted changes. Please commit or stash them before running unpull."; return 1; fi; if [[ -n $(git log --branches --not --remotes) ]]; then echo "There are unpushed commits. Please push or reset them before running unpull."; return 1; fi; last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}'); git reset --hard "$last_commit_hash"; echo "Successfully reset to the commit before the last pull: $last_commit_hash"; }
 # >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
+
 
