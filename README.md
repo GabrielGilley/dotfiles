@@ -34,8 +34,15 @@ cda auto runs ls with -A
 
 up will run cd .. as many times as the integer that is found at $1. Ex: "up 3" runs "cd ../../.."
 
-back will go back to the directory that was found before most recent cd. Ex: in /scratch/data/exp1/ $ cd /users/$USER/home/results $ # some operations $ back $ # now you are in /scratch/data/exp1
+back will go back to the directory that was found before most recent cd.
 
+Ex: in /scratch/data/exp1/
+```
+$ cd /users/$USER/home/results
+$ # some operations
+$ back
+$ # now you are in /scratch/data/exp1
+```
 ### Other
 oops reruns previous command using $1 as new $0. Ex: "cat dir" gives "dir is a directory" error, then running "oops ls" runs "ls dir".
 
