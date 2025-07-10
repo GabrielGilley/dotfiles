@@ -54,7 +54,7 @@ gc and gu comment and uncomment lines from normal and visual modes. Auto-detects
 Add new file types in vim/commenting
 
 ### Copy to clipboard
-In normal and visual modes, \y and \d work like yy and dd but also copy to clipboard. Supposed to auto-detect shell for appropriate clipboard but only tested for mac.
+In normal and visual modes, \y and \d work like yy and dd but only copy to clipboard. Supposed to auto-detect shell for appropriate clipboard but only tested for mac.
 
 ### Surrounding a Word
 Tpope's:
