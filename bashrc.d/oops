@@ -1,0 +1,251 @@
+#!/bin/bash
+
+oops() {
+    local last_command
+
+    oops_usage() {
+        cat <<'EOF'
+Usage:
+  oops <word>
+      Re-run the most recent non-oops command after replacing its main command
+      word with <word>.
+
+  oops add <word1> [<word2> ...]
+      Re-run the most recent non-oops command after prepending one or more words
+      to the front of the command.
+
+  oops remove <word1> [<word2> ...]
+      Re-run the most recent non-oops command after removing every token that
+      exactly matches any supplied word.
+
+  oops [add <words...>] [and remove <words...>] [and <word>]
+      Combine add, remove, and replacement in any order. The outcome does not
+      depend on clause order:
+        - add always prepends words
+        - remove always removes matching tokens
+        - a bare word always replaces the main command word
+
+Examples:
+  oops ls
+  oops add sudo
+  oops remove sudo -a
+  oops remove sudo and add time and ls
+  oops add sudo and ls and remove time
+
+Notes:
+  - oops always operates on the most recent command in history that is not itself
+    an oops command.
+  - remove performs exact token removal; it does not do substring matching.
+EOF
+    }
+
+    last_command=$(
+        history | tac | sed 's/^[ ]*[0-9]*[ ]*//' | grep -vE '^oops([[:space:]]|$)' | head -n 1
+    )
+
+    if [[ -z "$last_command" ]]; then
+        echo "No previous non-oops command found."
+        return 1
+    fi
+
+    if [[ $# -eq 0 ]]; then
+        oops_usage
+        return 1
+    fi
+
+    local tokens=()
+    read -r -a tokens <<< "$last_command"
+
+    if [[ ${#tokens[@]} -eq 0 ]]; then
+        echo "Refusing to operate on an empty command."
+        return 1
+    fi
+
+    local add_words=()
+    local remove_words=()
+    local replacement=""
+
+    local clause=()
+    local clauses=()
+    local arg
+
+    join_clause() {
+        local out=""
+        local tok
+        for tok in "$@"; do
+            if [[ -z "$out" ]]; then
+                out="$tok"
+            else
+                out+=" $tok"
+            fi
+        done
+        printf '%s\n' "$out"
+    }
+
+    for arg in "$@"; do
+        if [[ "$arg" == "and" ]]; then
+            if [[ ${#clause[@]} -eq 0 ]]; then
+                echo "Improper usage: empty clause before or after 'and'."
+                oops_usage
+                return 1
+            fi
+            clauses+=("$(join_clause "${clause[@]}")")
+            clause=()
+        else
+            clause+=("$arg")
+        fi
+    done
+
+    if [[ ${#clause[@]} -eq 0 ]]; then
+        echo "Improper usage: trailing 'and' is not valid."
+        oops_usage
+        return 1
+    fi
+    clauses+=("$(join_clause "${clause[@]}")")
+
+    local clause_str
+    local clause_tokens=()
+    local head
+
+    for clause_str in "${clauses[@]}"; do
+        read -r -a clause_tokens <<< "$clause_str"
+
+        if [[ ${#clause_tokens[@]} -eq 0 ]]; then
+            echo "Improper usage: empty clause."
+            oops_usage
+            return 1
+        fi
+
+        head="${clause_tokens[0]}"
+
+        if [[ "$head" == "add" ]]; then
+            if [[ ${#clause_tokens[@]} -lt 2 ]]; then
+                echo "Improper usage: 'oops add' requires one or more words to prepend."
+                oops_usage
+                return 1
+            fi
+            add_words+=("${clause_tokens[@]:1}")
+
+        elif [[ "$head" == "remove" ]]; then
+            if [[ ${#clause_tokens[@]} -lt 2 ]]; then
+                echo "Improper usage: 'oops remove' requires one or more words to remove."
+                oops_usage
+                return 1
+            fi
+            remove_words+=("${clause_tokens[@]:1}")
+
+        elif [[ "$head" == "and" ]]; then
+            echo "Improper usage: 'and' must separate clauses."
+            oops_usage
+            return 1
+
+        else
+            if [[ ${#clause_tokens[@]} -ne 1 ]]; then
+                echo "Improper usage: replacement clause must be a single word."
+                oops_usage
+                return 1
+            fi
+            if [[ -n "$replacement" ]]; then
+                echo "Improper usage: only one replacement word may be supplied."
+                oops_usage
+                return 1
+            fi
+            replacement="${clause_tokens[0]}"
+        fi
+    done
+
+    local prefixes=()
+    local main_cmd="${tokens[0]}"
+    local args_only=()
+    local t
+
+    # Identify leading prefix-like words from the original command.
+    # These are treated separately so replacement always targets the main command.
+    while [[ "$main_cmd" == "sudo" || "$main_cmd" == "time" || "$main_cmd" == "watch" || "$main_cmd" == "command" || "$main_cmd" == "env" || "$main_cmd" == "nohup" || "$main_cmd" == "stdbuf" ]]; do
+        prefixes+=("$main_cmd")
+        tokens=("${tokens[@]:1}")
+        if [[ ${#tokens[@]} -eq 0 ]]; then
+            echo "Refusing to operate on a command with no main command."
+            return 1
+        fi
+        main_cmd="${tokens[0]}"
+    done
+
+    if [[ ${#tokens[@]} -gt 1 ]]; then
+        args_only=("${tokens[@]:1}")
+    fi
+
+    local filtered_prefixes=()
+    local filtered_args=()
+    local rm
+    local should_remove
+
+    for t in "${prefixes[@]}"; do
+        should_remove=0
+        for rm in "${remove_words[@]}"; do
+            if [[ "$t" == "$rm" ]]; then
+                should_remove=1
+                break
+            fi
+        done
+        if [[ $should_remove -eq 0 ]]; then
+            filtered_prefixes+=("$t")
+        fi
+    done
+
+    should_remove=0
+    for rm in "${remove_words[@]}"; do
+        if [[ "$main_cmd" == "$rm" ]]; then
+            should_remove=1
+            break
+        fi
+    done
+    if [[ $should_remove -eq 1 ]]; then
+        main_cmd=""
+    fi
+
+    for t in "${args_only[@]}"; do
+        should_remove=0
+        for rm in "${remove_words[@]}"; do
+            if [[ "$t" == "$rm" ]]; then
+                should_remove=1
+                break
+            fi
+        done
+        if [[ $should_remove -eq 0 ]]; then
+            filtered_args+=("$t")
+        fi
+    done
+
+    prefixes=("${add_words[@]}" "${filtered_prefixes[@]}")
+
+    if [[ -n "$replacement" ]]; then
+        main_cmd="$replacement"
+    fi
+
+    local final_tokens=()
+    final_tokens+=("${prefixes[@]}")
+
+    if [[ -n "$main_cmd" ]]; then
+        final_tokens+=("$main_cmd")
+    fi
+
+    final_tokens+=("${filtered_args[@]}")
+
+    if [[ ${#final_tokens[@]} -eq 0 ]]; then
+        echo "Refusing to run an empty command after transformations."
+        return 1
+    fi
+
+    local modified_command=""
+    for t in "${final_tokens[@]}"; do
+        if [[ -z "$modified_command" ]]; then
+            modified_command="$t"
+        else
+            modified_command+=" $t"
+        fi
+    done
+
+    eval "$modified_command"
+}
+
