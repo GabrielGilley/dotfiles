@@ -22,7 +22,7 @@ Runs selected command in a tmux shell in the background and auto kills it
 Why? terminal sharing, persistence through ssh disconnect, reattaching
 
 ### Directory Navigation 
-`ls` commands default to `eza` if it is installed.
+```ls``` commands default to ```eza``` if it is installed.
 
 `mcdir $1` makes and changes into a directory, allows for pathing
 
@@ -37,16 +37,55 @@ Why? terminal sharing, persistence through ssh disconnect, reattaching
 `back` will go back to the directory that was found before most recent `cd`.
 
 Ex: in /scratch/data/exp1/
-```
 $ cd /users/$USER/home/results
 $ # some operations
 $ back
 $ # now you are in /scratch/data/exp1
-```
+
 ### Other
 `oops $1` reruns previous command using `$1` as new `$0`. Ex: `cat dir` gives "dir is a directory" error, then running `oops ls` runs `ls dir`.
 
 `tat $1` runs `tmux attach -t $1`  
+
+mvn, lsn, cpn, lan, ldn, lln all will grab the parent directory of the first argument and use it for the second.
+
+Example: mv /cscratch/dir/temp/really/long/name/file.txt /cscratch/dir/temp/really/long/name/file1.txt becomes mvn /cscratch/dir/temp/really/long/name/file.txt file1.txt
+
+### Other
+#### Oops:
+
+oops $1 reruns previous command using $1 as new $0. Ex: "cat dir" gives "dir is a directory" error, then running "oops ls" runs "ls dir".
+
+oops add $2 [$3 ...] reruns previous command with any number of arguments prepended.
+
+oops remove $2 [$3 ...] reruns previous command with any number of arguments removed.
+
+The three clauses can be separated in any order with "and" to combine them.
+
+For example:
+
+$ cat /tmp /scratch
+
+oops add time watch sudo and remove /scratch and cd
+
+will run `time watch sudo cd /tmp`
+
+Oops will ignore previous "oops" commands, so one can then follow up with:
+
+oops add time watch sudo and remove /scratch and ls
+
+which will run `time watch sudo ls /tmp`
+
+#### Tmux:
+tat $1 runs tmux attach -t $1  
+
+tns $1 will make a new session called $1
+
+tmls will list tmux sessions
+
+tks $1 will kill a tmux session
+
+tans $1 will make and attach to a new session
 
 ## Vim custom commands
 ### Commenting

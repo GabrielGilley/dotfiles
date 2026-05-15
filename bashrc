@@ -170,7 +170,11 @@ tns() { tmux new-session -s $1; }
 # tans() { tmux new-session -s $1 && tmux a -t $1; } 
 
 # ls upon cd
-cd()  { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
+if [[ $- == *i* ]]; then
+  # Your interactive-only customizations here
+    cd() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
+fi
+# cd()  { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
 cda() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && la; }
 
 
@@ -192,8 +196,7 @@ up(){ n=${1:-1}; [ "$n" -ge 1 ] 2>/dev/null && cd "$(eval printf '../'%.0s {1..$
 # Return to previous directory
 back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous directory recorded."; fi; }
 
-# Change $0 of last command
-oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*//'); if [[ -n "$last_command" ]]; then first_arg=$(echo "$last_command" | awk '{print $1}'); modified_command="${last_command/$first_arg/$1}"; eval "$modified_command"; else echo "No previous command found."; fi; }
+source ~/.bashrc.d/oops
 
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
@@ -244,6 +247,7 @@ save_file() {
     # expand to an absolute POSIX path, then hand it to AppleScript
     osascript -e 'set the clipboard to (POSIX file "'"$(realpath "$1")"'")'
 }
+
 # Move or copy and assume same directory
 mvn() { [ "$#" -ne 2 ] && { echo "Usage: mvn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || mv "$1" "$(dirname "$1")/$2"; }
 cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || cp "$1" "$(dirname "$1")/$2"; }
