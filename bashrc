@@ -130,15 +130,15 @@ alias diff='diff -y --color'
 # Use EZA if available
 # We throw 'e' on the end as these are internal, 'ls' is overwritten with a function.
 if command -v eza >/dev/null 2>&1; then
-    alias lde='eza -d --group-directories-first .*'
-    alias lle='eza -Algh --git --group-directories-first --time-style=long-iso'
-    alias lse='eza --group-directories-first'
-    alias lae='eza -A --group-directories-first'
+    alias ld='eza -d --group-directories-first .*'
+    alias ll='eza -Algh --git --group-directories-first --time-style=long-iso'
+    alias ls='eza --group-directories-first'
+    alias la='eza -A --group-directories-first'
 else
-    alias lde='command ls -dA --color=auto .*' # list hidden entries
-    alias lle='command ls -Alh --color=auto'   # long list, human-readable
-    alias lse='command ls --color=auto'        # simple listing
-    alias lae='command ls -A --color=auto'     # show almost all
+    alias ld='command ls -dA --color=auto .*' # list hidden entries
+    alias ll='command ls -Alh --color=auto'   # long list, human-readable
+    alias ls='command ls --color=auto'        # simple listing
+    alias la='command ls -A --color=auto'     # show almost all
 fi
 
 alias python=python3
