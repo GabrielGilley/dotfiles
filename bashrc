@@ -8,7 +8,10 @@ fi
 
 if [ -f ~/.bashrc.d/proxies ] && [ "$SET_PROXIES" = true ]; then
     source ~/.bashrc.d/proxies
+else
+    source ~/.bashrc.d/no_proxies
 fi
+
 
 # -------------------------------------- Env and Hooks -------------------------------------- # 
 
@@ -47,15 +50,7 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# user_color() {
-#   if [[ $EUID == 0 ]]; then
-#     echo -ne '\[\e[1;91m\]'
-#   else
-#     echo -ne '\[\e[1;32m\]'
-#   fi
-# }
-
-# export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
+=======
 # ---- Prompt ---- #
 
 error_flag=0
@@ -79,6 +74,8 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Shut this up
 set bell-style none
+
+# =======
 
 # Get vim on the command line
 set -o vi
@@ -179,7 +176,6 @@ cda() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && la; }
 
 
 # Override ls for lsn convenience
-# ls() {echo "Test"; }
 # ls() { if [ "$#" -gt 1 ]; then echo "Usage: ls [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
 # ld() { if [ "$#" -gt 1 ]; then echo "Usage: ld [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
 # ll() { if [ "$#" -gt 1 ]; then echo "Usage: ll [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
@@ -196,6 +192,7 @@ up(){ n=${1:-1}; [ "$n" -ge 1 ] 2>/dev/null && cd "$(eval printf '../'%.0s {1..$
 # Return to previous directory
 back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous directory recorded."; fi; }
 
+# Change $0 of last command
 source ~/.bashrc.d/oops
 
 # View a markdown file prettily
@@ -261,10 +258,10 @@ cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_sta
 # |$ lsn dir1                                  |
 # ----------------------------------------------
 
-lsn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ls "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-lan() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && la "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-ldn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ld "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-lln() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ll "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lsn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ls "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lan() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && la "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# ldn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ld "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lln() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ll "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
 
 # Add, commit, and push
 gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
@@ -273,3 +270,4 @@ gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit messag
 unpull() { if [[ -n $(git status --porcelain) ]]; then echo "There are uncommitted changes. Please commit or stash them before running unpull."; return 1; fi; if [[ -n $(git log --branches --not --remotes) ]]; then echo "There are unpushed commits. Please push or reset them before running unpull."; return 1; fi; last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}'); git reset --hard "$last_commit_hash"; echo "Successfully reset to the commit before the last pull: $last_commit_hash"; }
 
 
+export PATH="$HOME/cask/launchers:$PATH"
