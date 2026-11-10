@@ -8,7 +8,10 @@ fi
 
 if [ -f ~/.bashrc.d/proxies ] && [ "$SET_PROXIES" = true ]; then
     source ~/.bashrc.d/proxies
+else
+    source ~/.bashrc.d/no_proxies
 fi
+
 
 # -------------------------------------- Env and Hooks -------------------------------------- # 
 
@@ -47,16 +50,6 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# <<<<<<< HEAD
-# user_color() {
-#   if [[ $EUID == 0 ]]; then
-#     echo -ne '\[\e[1;91m\]'
-#   else
-#     echo -ne '\[\e[1;32m\]'
-#   fi
-# }
-
-# export PS1="\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]┌──(\u)$(if [[ -n "${SSH_CONNECTION-}" ]]; then echo '\e[1;33m@\h'; fi)\[\e[0m\]-[\[\e[1;96m\]\w\[\e[0m\]] (\[\e[1;33m\]\t\[\e[0m\])\n\[\$(if [[ \$EUID == 0 ]]; then echo '\e[1;91m'; else echo '\e[1;32m'; fi)\]└─\[\e[0m\] \$(if [[ \$EUID == 0 ]]; then echo '#'; else echo '\$'; fi) "
 # =======
 # ---- Prompt ---- #
 
@@ -75,7 +68,6 @@ set_prompt() {
 PROMPT_COMMAND='set_prompt; history -a'
 
 # --------------- #
-# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 
 export EZA_COLORS="ur=1;33:uw=1;31:ux=1;32:gr=1;33:gw=1;31:gx=1;32:tr=1;33:tw=1;31:tx=1;32:uu=1;32:gu=1;32:da=1;33:di=1;36:ga=1;33:gm=1;33:gd=1;31:gn=1;32:sb=1;33:ln=1;31:or=31"
 export BASH_SILENCE_DEPRECATION_WARNING=1
@@ -83,13 +75,6 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # Shut this up
 set bell-style none
 
-# <<<<<<< HEAD
-# # Enable vim keybinds in the command line
-# set -o vi
-
-# # enable programmable completion features (you don't need to enable
-# # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# # sources /etc/bash.bashrc).
 # # =======
 # Get vim on the command line
 set -o vi
@@ -105,7 +90,6 @@ bind -m vi-command '"<C-H>": "0"'
 bind -m vi-command '"<C-L>": "^"'
 
 # Programmable completion
-# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion
@@ -188,11 +172,11 @@ cda() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && la; }
 
 
 # Override ls for lsn convenience
-# ls() {echo "Test"; }
-ls() { if [ "$#" -gt 1 ]; then echo "Usage: ls [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
-ld() { if [ "$#" -gt 1 ]; then echo "Usage: ld [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
-ll() { if [ "$#" -gt 1 ]; then echo "Usage: ll [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
-la() { if [ "$#" -gt 1 ]; then echo "Usage: la [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lae "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+# # ls() {echo "Test"; }
+# ls() { if [ "$#" -gt 1 ]; then echo "Usage: ls [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+# ld() { if [ "$#" -gt 1 ]; then echo "Usage: ld [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+# ll() { if [ "$#" -gt 1 ]; then echo "Usage: ll [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
+# la() { if [ "$#" -gt 1 ]; then echo "Usage: la [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lae "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
 
 # ls()  { [ "$#" -gt 1 ] && { echo "Usage: ls [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
 # ld()  { [ "$#" -gt 1 ] && { echo "Usage: ld [directory]"; return 1; } && [ -d "${1:-.}" ] && { LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; } || echo "Directory '${1:-.}' does not exist."; }
@@ -206,12 +190,11 @@ up(){ n=${1:-1}; [ "$n" -ge 1 ] 2>/dev/null && cd "$(eval printf '../'%.0s {1..$
 back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous directory recorded."; fi; }
 
 # Change $0 of last command
-oops() { last_command=$(history | tail -n 2 | head -n 1 | sed 's/^[ ]*[0-9]*[ ]*//'); if [[ -n "$last_command" ]]; then first_arg=$(echo "$last_command" | awk '{print $1}'); modified_command="${last_command/$first_arg/$1}"; eval "$modified_command"; else echo "No previous command found."; fi; }
+source ~/.bashrc.d/oops
 
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
 
-# <<<<<<< HEAD
 # Renames a pdf to LastName-Year-title-separated-by-hyphens.pdf
 # rename_pdf  oldfile.pdf
 # → Lastname-year-title-with-hyphens.pdf
@@ -272,16 +255,16 @@ cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_sta
 # |$ lsn dir1                                  |
 # ----------------------------------------------
 
-lsn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ls "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-lan() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && la "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-ldn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ld "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
-lln() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ll "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lsn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ls "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lan() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && la "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# ldn() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ld "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
+# lln() { TARGET_DIR="${LAST_LS_DIR:-$(pwd)}/$1"; [ -d "$TARGET_DIR" ] && ll "$TARGET_DIR" || echo "Directory '$TARGET_DIR' does not exist."; }
 
 # Add, commit, and push
 gita() { [ "$#" -lt 2 ] && { echo "Usage: gita file1 [file2 ...] \"commit message\""; return 1; } || git add "${@:1:$#-1}" && git commit -m "${@: -1}" && git push; }
 
 # Revert from last pull
 unpull() { if [[ -n $(git status --porcelain) ]]; then echo "There are uncommitted changes. Please commit or stash them before running unpull."; return 1; fi; if [[ -n $(git log --branches --not --remotes) ]]; then echo "There are unpushed commits. Please push or reset them before running unpull."; return 1; fi; last_commit_hash=$(git reflog show HEAD | awk 'NR==2 {print $1}'); git reset --hard "$last_commit_hash"; echo "Successfully reset to the commit before the last pull: $last_commit_hash"; }
-# >>>>>>> 70d20b13eaf7a7e7f12f6e6c462cbbc8a339a515
 
 
+export PATH="$HOME/cask/launchers:$PATH"
