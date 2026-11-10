@@ -194,8 +194,20 @@ back() { if [ -n "$LAST_DIR" ]; then cd "$LAST_DIR"; else echo "No previous dire
 # Change $0 of last command
 source ~/.bashrc.d/oops
 
-proxy() { source ~/computer-setup/scripts/set_proxies.sh; }
-unproxy() { source ~/computer-setup/scripts/unset_proxies.sh; }
+proxy() {
+    case "$1" in
+        on)
+            source ~/computer-setup/scripts/set_proxies.sh
+            ;;
+        off)
+            source ~/computer-setup/scripts/unset_proxies.sh
+            ;;
+        *)
+            echo "Usage: proxy {on|off}"
+            return 1
+            ;;
+    esac
+}
 
 # View a markdown file prettily
 viewmd() { pandoc "$1" -t html | w3m -T text/html 2>/dev/null; }
