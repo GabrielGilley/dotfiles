@@ -42,7 +42,7 @@ unset __conda_setup
 
 export EDITOR=vim
 
-source ~/.bashrc.d/ai_key
+# source ~/.bashrc.d/ai_key
 
 # -------------------------------------- Environment -------------------------------------- # 
 
@@ -50,7 +50,7 @@ if [ -f /etc/bashrc ]; then
     . /etc/bashrc
 fi
 
-# =======
+=======
 # ---- Prompt ---- #
 
 error_flag=0
@@ -75,7 +75,8 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 # Shut this up
 set bell-style none
 
-# # =======
+# =======
+
 # Get vim on the command line
 set -o vi
 
@@ -126,22 +127,21 @@ alias diff='diff -y --color'
 # Use EZA if available
 # We throw 'e' on the end as these are internal, 'ls' is overwritten with a function.
 if command -v eza >/dev/null 2>&1; then
-    alias lde='eza -d --group-directories-first .*'
-    alias lle='eza -Algh --git --group-directories-first --time-style=long-iso'
-    alias lse='eza --group-directories-first'
-    alias lae='eza -A --group-directories-first'
+    alias ld='eza -d --group-directories-first .*'
+    alias ll='eza -Algh --git --group-directories-first --time-style=long-iso'
+    alias ls='eza --group-directories-first'
+    alias la='eza -A --group-directories-first'
 else
-    alias lde='command ls -dA --color=auto .*' # list hidden entries
-    alias lle='command ls -Alh --color=auto'   # long list, human-readable
-    alias lse='command ls --color=auto'        # simple listing
-    alias lae='command ls -A --color=auto'     # show almost all
+    alias ld='command ls -dA --color=auto .*' # list hidden entries
+    alias ll='command ls -Alh --color=auto'   # long list, human-readable
+    alias ls='command ls --color=auto'        # simple listing
+    alias la='command ls -A --color=auto'     # show almost all
 fi
 
 alias python=python3
 alias pudb=pudb3
 alias mypy='mypy --strict --disallow-any-explicit'
 alias tmls='tmux ls'
-alias tr='tmux-run'
 alias py='source ~/.default_python/bin/activate'
 alias bat='batcat'
 alias rub='git push origin --delete'
@@ -164,15 +164,18 @@ mcdir() { mkdir -p "$1" && cd "$1"; }
 tat() { tmux a -t $1; }
 tks() { tmux kill-session -t $1; }
 tns() { tmux new-session -s $1; }
-tans() { tmux new-session -s $1 && tmux a -t $1; } 
+# tans() { tmux new-session -s $1 && tmux a -t $1; } 
 
 # ls upon cd
-cd()  { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
+if [[ $- == *i* ]]; then
+  # Your interactive-only customizations here
+    cd() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
+fi
+# cd()  { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && ls; }
 cda() { [ -n "$PWD" ] && export LAST_DIR="$PWD"; builtin cd "$@" && la; }
 
 
 # Override ls for lsn convenience
-# # ls() {echo "Test"; }
 # ls() { if [ "$#" -gt 1 ]; then echo "Usage: ls [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lse "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
 # ld() { if [ "$#" -gt 1 ]; then echo "Usage: ld [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lde "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
 # ll() { if [ "$#" -gt 1 ]; then echo "Usage: ll [directory]"; return 1; fi; if [ -d "${1:-.}" ]; then LAST_LS_DIR="${1:-.}"; lle "${1:-.}"; else echo "Directory '${1:-.}' does not exist."; fi; }
@@ -241,7 +244,7 @@ save_file() {
     # expand to an absolute POSIX path, then hand it to AppleScript
     osascript -e 'set the clipboard to (POSIX file "'"$(realpath "$1")"'")'
 }
-# =======
+
 # Move or copy and assume same directory
 mvn() { [ "$#" -ne 2 ] && { echo "Usage: mvn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || mv "$1" "$(dirname "$1")/$2"; }
 cpn() { [ "$#" -ne 2 ] && { echo "Usage: cpn long/path/to/source/file assume_starting_in_same_dir_file"; return 1; } || cp "$1" "$(dirname "$1")/$2"; }
