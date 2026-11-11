@@ -76,22 +76,24 @@ endfunction
 " Uncomment selected block
 function! ManualUncommentBlock()
   let l:cc = GetCommentChar()
+
   if l:cc == '<!--'
     silent '<,'>s/^\s*<!--\s*//
     silent '<,'>s/\s*-->$//
   else
-    execute "'<,'>s/^\\s*" . escape(l:cc, '#') . "\\s\\?//"
+    execute "'<,'>s@^\\s*\\V" . escape(l:cc, '\@') . "\\m\\s\\?@@"
   endif
 endfunction
 
 " Uncomment current line
 function! ManualUncommentLine()
   let l:cc = GetCommentChar()
+
   if l:cc == '<!--'
     execute 's/^\s*<!--\s*//'
     execute 's/\s*-->$//'
   else
-    execute 's/^\s*' . escape(l:cc, '#') . '\s\?//'
+    execute "s@^\\s*\\V" . escape(l:cc, '\@') . "\\m\\s\\?@@"
   endif
 endfunction
 
